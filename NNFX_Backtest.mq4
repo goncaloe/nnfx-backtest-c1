@@ -1,7 +1,8 @@
-﻿//+---------------------------------------------------------------------------|
+//+---------------------------------------------------------------------------|
 //|                                                        NNFX_backtest.mq4  |
 //|                                                       by Gonçalo Esteves  |
 //|                                                          August 17, 2019  |
+//|                                                                     v1.2  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -97,12 +98,14 @@ double getLots(double StopInPips)
  
    double LotStep = MarketInfo(Symbol(), MODE_LOTSTEP);
    double LotSize = MarketInfo(Symbol(), MODE_LOTSIZE);
-   double LotTickValue = MarketInfo(Symbol(), MODE_TICKVALUE);
+   double TickValue = MarketInfo(Symbol(), MODE_TICKVALUE);
 
-   if(LotStep == 0.01)
-      Decimals = 2;
-   if(LotStep == 0.1)
+   if(LotStep == 0.1){
       Decimals = 1;
+   }
+   else if(LotStep == 0.01){
+      Decimals = 2;
+   }
    
    switch (MoneyManagementMethod)
    {
@@ -119,7 +122,11 @@ double getLots(double StopInPips)
          return(MoneyManagementLots);
    }
       
-   lot = (AccountValue * (RiskPercent/100)) / (LotTickValue * StopInPips * 10.0);
+   if(Point == 0.001 || Point == 0.00001){ 
+      TickValue *= 10;
+   }
+      
+   lot = (AccountValue * (RiskPercent/100)) / (TickValue * StopInPips);
    lot = StrToDouble(DoubleToStr(lot,Decimals));
    if (lot < myMinLot){ 
       lot = myMinLot;
@@ -188,64 +195,47 @@ int openTrade(int signal, string msg, double mLots, double mStopLoss, double mTa
 }
 
 
+/*
+   return int: the signal of indicator
+      -1: no sinal:
+      OP_BUY: long signal
+      OP_SELL: short signal
+   uncomment only the indicator that we are testing    
+*/
 int getSignal()
 {
    //MA:
    //int result = getMASignal("TEMA", 25);
    
    //Crossover:
-   //double crossParams[] = {14};
-   //int result = getIndicatorCrossoverSignal("Vortex", 14, 0, 1);
-   double crossParams[] = {25};
-   int result = getIndicatorCrossoverSignal("SSL", 25, 0, 1); 
-   //double crossParams[] = {0,7,3,4,3};
-   //int result = getIndicatorCrossoverArraySignal("Absolute_Strength_Histogram", crossParams, 2, 3);
+   //double indParams[] = {14};
+   //int result = getIndicatorCrossoverSignal("Vortex", indParams, 1, 0);
+   double indParams[] = {25};
+   int result = getIndicatorCrossoverSignal("SSL", indParams, 0, 1);
+   
+   //double indParams[] = {0,7,3,4,3};
+   //int result = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 3, 2);
    
    //Others:
    //int result = getDidiSignal();
-   //double chaffParams[] = {15, 120, 240};
-   //int result = getChaffSignal(chaffParams);
-   
-   // todo:
-   // 
-   
-   
+   //double indParams[] = {15, 120, 240};
+   //int result = getChaffSignal(indParams);
+
    return(result);
 }
 
 
-int getIndicatorCrossoverSignal(string ind, int period, int buff1, int buff2)
-{
-   // https://quivofx.com/school/learn-mql4/chapter-5-adding-custom-indicator-ea/
-   double v0Curr = iCustom(NULL, 0, ind, period, buff1, 1);
-   double v0Prev = iCustom(NULL, 0, ind, period, buff1, 2);
-   double v1Curr = iCustom(NULL, 0, ind, period, buff2, 1);
-   double v1Prev = iCustom(NULL, 0, ind, period, buff2, 2);
-
-   //string pr = StringConcatenate("Nonsense_RVI_0: ", v0, "Nonsense_RVI_1: ", v1);
-   //Print(pr);
-   
-   int signal = -1;
-   if(v0Prev < v1Prev && v0Curr > v1Curr){
-      signal = OP_BUY;
-   }
-   else if(v0Prev > v1Prev && v0Curr < v1Curr){
-      signal = OP_SELL;
-   }
-   return(signal);
-}
-
-int getIndicatorCrossoverArraySignal(string ind, double &params[], int buff1, int buff2)
+int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buff2)
 {
    double v0Curr = iCustomArray(NULL, 0, ind, params, buff1, 1);
    double v0Prev = iCustomArray(NULL, 0, ind, params, buff1, 2);
    double v1Curr = iCustomArray(NULL, 0, ind, params, buff2, 1);
    double v1Prev = iCustomArray(NULL, 0, ind, params, buff2, 2);  
    int signal = -1;
-   if(v0Prev < v1Prev && v0Curr > v1Curr){
+   if(v0Prev > v1Prev && v0Curr < v1Curr){
       signal = OP_BUY;
    }
-   else if(v0Prev > v1Prev && v0Curr < v1Curr){
+   else if(v0Prev < v1Prev && v0Curr > v1Curr){
       signal = OP_SELL;
    }
    return(signal);
@@ -335,3 +325,4 @@ double iCustomArray(string symbol, int timeframe, string indicator, double &para
    }
    return(0);
 }
+
