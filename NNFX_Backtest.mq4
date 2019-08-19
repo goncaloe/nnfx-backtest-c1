@@ -209,12 +209,11 @@ int getSignal()
    
    //Crossover:
    //double indParams[] = {14};
-   //int result = getIndicatorCrossoverSignal("Vortex", indParams, 1, 0);
+   //int result = getIndicatorCrossoverSignal("Vortex", indParams, 0, 1);
    double indParams[] = {25};
-   int result = getIndicatorCrossoverSignal("SSL", indParams, 0, 1);
-   
+   int result = getIndicatorCrossoverSignal("SSL", indParams, 1, 0);
    //double indParams[] = {0,7,3,4,3};
-   //int result = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 3, 2);
+   //int result = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 2, 3);
    
    //Others:
    //int result = getDidiSignal();
@@ -232,10 +231,10 @@ int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buf
    double v1Curr = iCustomArray(NULL, 0, ind, params, buff2, 1);
    double v1Prev = iCustomArray(NULL, 0, ind, params, buff2, 2);  
    int signal = -1;
-   if(v0Prev > v1Prev && v0Curr < v1Curr){
+   if(v0Prev < v1Prev && v0Curr > v1Curr){
       signal = OP_BUY;
    }
-   else if(v0Prev < v1Prev && v0Curr > v1Curr){
+   else if(v0Prev > v1Prev && v0Curr < v1Curr){
       signal = OP_SELL;
    }
    return(signal);
