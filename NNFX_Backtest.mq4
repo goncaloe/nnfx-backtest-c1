@@ -2,10 +2,14 @@
 //|                                                        NNFX_backtest.mq4  |
 //|                                                       by Gonçalo Esteves  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.2  |
+//|                                                                     v1.3  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
+
+#define FLAT 0
+#define LONG 1
+#define SHORT 2
 
 extern int MagicNumber = 265258;
 extern int ATRPeriod = 14;
@@ -53,11 +57,11 @@ void checkForOpen(){
 
    int signal = getSignal();
    
-   if(signal == OP_BUY){
+   if(signal == LONG){
       myLots = getLots(stopLoss);
       myTicket = openTrade(OP_BUY, "Buy Order", myLots, stopLoss, takeProfit);
    }
-   else if(signal == OP_SELL){
+   else if(signal == SHORT){
       myLots = getLots(stopLoss);
       myTicket = openTrade(OP_SELL, "Sell Order", myLots, stopLoss, takeProfit);
    }
@@ -205,22 +209,30 @@ int openTrade(int signal, string msg, double mLots, double mStopLoss, double mTa
 int getSignal()
 {
    //MA:
-   //int result = getMASignal("TEMA", 25);
+   //int signal = getIndicatorMASignal("TEMA", 25, 0);
+   
+   //Zerocross:
+   //double indParams[] = {20};
+   //int signal = getIndicatorZerocrossSignal("CMF", indParams, 0);
    
    //Crossover:
    //double indParams[] = {14};
-   //int result = getIndicatorCrossoverSignal("Vortex", indParams, 0, 1);
+   //int signal = getIndicatorCrossoverSignal("Vortex", indParams, 0, 1);
    double indParams[] = {25};
-   int result = getIndicatorCrossoverSignal("SSL", indParams, 1, 0);
+   int signal = getIndicatorCrossoverSignal("SSL", indParams, 1, 0);
    //double indParams[] = {0,7,3,4,3};
-   //int result = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 2, 3);
+   //int signal = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 2, 3);
+   //double indParams[] = {14};
+   //int signal = getIndicatorCrossoverSignal("RVI", indParams, 0, 1);
+   //double indParams[] = {14};
+   //int signal = getIndicatorCrossoverSignal("Aroon_Horn", indParams, 0, 1);
    
    //Others:
    //int result = getDidiSignal();
    //double indParams[] = {15, 120, 240};
-   //int result = getChaffSignal(indParams);
+   //int signal = getChaffSignal(indParams);
 
-   return(result);
+   return(signal);
 }
 
 
@@ -230,75 +242,52 @@ int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buf
    double v0Prev = iCustomArray(NULL, 0, ind, params, buff1, 2);
    double v1Curr = iCustomArray(NULL, 0, ind, params, buff2, 1);
    double v1Prev = iCustomArray(NULL, 0, ind, params, buff2, 2);  
-   int signal = -1;
+   int signal = FLAT;
    if(v0Prev < v1Prev && v0Curr > v1Curr){
-      signal = OP_BUY;
+      signal = LONG;
    }
    else if(v0Prev > v1Prev && v0Curr < v1Curr){
-      signal = OP_SELL;
+      signal = SHORT;
    }
    return(signal);
 }
 
-
-int getMASignal(string ind, int period)
+int getIndicatorZerocrossSignal(string ind, double &params[], int buff)
 {
-   double vCurr = iCustom(NULL, 0, ind, period, 0, 1);
-   double vPrev = iCustom(NULL, 0, ind, period, 0, 2);
-   double vPrev2 = iCustom(NULL, 0, ind, period, 0, 3);
+   double vCurr = iCustomArray(NULL, 0, ind, params, buff, 1);
+   double vPrev = iCustomArray(NULL, 0, ind, params, buff, 2);  
+   int signal = FLAT;
+   if(vPrev < 0 && vCurr >= 0){
+      signal = LONG;
+   }
+   else if(vPrev > 0 && vCurr <= 0){
+      signal = SHORT;
+   }
+   return(signal);
+}
+
+int getIndicatorMASignal(string ind, double &params[], int buff)
+{
+   double vCurr = iCustom(NULL, 0, ind, params[0], buff, 1);
+   double vPrev = iCustom(NULL, 0, ind, params[0], buff, 2);
+   double vPrev2 = iCustom(NULL, 0, ind, params[0], buff, 3);
    
-   int signal = -1;
+   int signal = FLAT;
    if(vCurr > vPrev && vPrev2 >= vPrev){
-      signal = OP_BUY;
+      signal = LONG;
    }
    else if(vCurr < vPrev && vPrev2 <= vPrev){
-      signal = OP_SELL;
+      signal = SHORT;
    }
    return(signal);
 }
 
-
-int getChaffSignal(double &params[])
+// alias
+int getIndicatorMASignal(string ind, double period, int buff)
 {
-   string ind = "Schaff_Trend_Cycle";
-   //double vCurr = iCustom(NULL, 0, ind, 15, 120, 240, 0, 1);
-   //double vPrev = iCustom(NULL, 0, ind, 15, 120, 240, 0, 2);
-
-   double vCurr = iCustomArray(NULL, 0, ind, params, 0, 1);
-   double vPrev = iCustomArray(NULL, 0, ind, params, 0, 2);
-   
-   int signal = -1;
-   
-   if(vPrev < 10 && vCurr > 10){
-      signal = OP_BUY;
-   }
-   else if(vPrev > 90 && vCurr < 90){
-      signal = OP_SELL;
-   }
-   
-   return(signal);
-}
-
-int getDidiSignal()
-{
-   string ind = "Didi_Index";
-   // regras: https://www.forexfactory.com/showthread.php?t=512503   
-   
-   double greenCurr = iCustom(NULL, 0, ind, 0, 1);
-   double greenPrev = iCustom(NULL, 0, ind, 0, 2);
-   double blue = 1.0;
-   double redCurr = iCustom(NULL, 0, ind, 2, 1);
-   double redPrev = iCustom(NULL, 0, ind, 2, 2);
-   
-   int signal = -1;
-   bool isCross = (greenPrev < blue && greenCurr > blue) || (redPrev > blue && redCurr < blue);
-   if(isCross && redCurr < blue){
-      signal = OP_BUY;
-   }
-   else if(isCross && greenCurr < blue){
-      signal = OP_SELL;
-   }
-   return(signal);
+   double indParams[] = {0};
+   indParams[0] = period;
+   return(getIndicatorMASignal(ind, indParams, buff));
 }
 
 
@@ -322,6 +311,52 @@ double iCustomArray(string symbol, int timeframe, string indicator, double &para
    else if(len == 5){
       return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], mode, shift);   
    }
+   else if(len == 6){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], mode, shift);   
+   }
    return(0);
 }
 
+// other specific indicators:
+int getChaffSignal(double &params[])
+{
+   string ind = "Schaff_Trend_Cycle";
+   //double vCurr = iCustom(NULL, 0, ind, 15, 120, 240, 0, 1);
+   //double vPrev = iCustom(NULL, 0, ind, 15, 120, 240, 0, 2);
+
+   double vCurr = iCustomArray(NULL, 0, ind, params, 0, 1);
+   double vPrev = iCustomArray(NULL, 0, ind, params, 0, 2);
+   
+   int signal = FLAT;
+   
+   if(vPrev < 10 && vCurr > 10){
+      signal = LONG;
+   }
+   else if(vPrev > 90 && vCurr < 90){
+      signal = SHORT;
+   }
+   
+   return(signal);
+}
+
+int getDidiSignal()
+{
+   string ind = "Didi_Index";
+   // regras: https://www.forexfactory.com/showthread.php?t=512503   
+   
+   double greenCurr = iCustom(NULL, 0, ind, 0, 1);
+   double greenPrev = iCustom(NULL, 0, ind, 0, 2);
+   double blue = 1.0;
+   double redCurr = iCustom(NULL, 0, ind, 2, 1);
+   double redPrev = iCustom(NULL, 0, ind, 2, 2);
+   
+   int signal = FLAT;
+   bool isCross = (greenPrev < blue && greenCurr > blue) || (redPrev > blue && redCurr < blue);
+   if(isCross && redCurr < blue){
+      signal = LONG;
+   }
+   else if(isCross && greenCurr < blue){
+      signal = SHORT;
+   }
+   return(signal);
+}
