@@ -19,6 +19,7 @@ extern int Slippage = 3;
 extern int MoneyManagementMethod = 1;
 extern double RiskPercent = 2;
 extern double MoneyManagementLots = 0.1;
+extern bool ReopenOnOppositeSignal = true;
 
 // GLOBAL VARIABLES:
 double myLots;
@@ -26,50 +27,65 @@ double myATR;
 double stopLoss;
 double takeProfit;
 int myTicket = -1;
+int myTrade = FLAT;
 
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 
 void init() {
-
-    //setup = "NNFX Indicator " + Symbol() + "_Daily";
 }
 
 
 void OnTick()
-{
-   
+{  
    checkTicket();
    
    checkForOpen();
-  
 }
 //+------------------------------------------------------------------+
 
 void checkForOpen(){
-   // salta se não foi o 1º tick do candle 
-   if(Volume[0]>1) return;
+   if(!ReopenOnOppositeSignal && myTicket != -1){
+      return;
+   }
    
-   if(myTicket > 0) return; 
-
-   updateValues();
-
    int signal = getSignal();
    
-   if(signal == LONG){
-      myLots = getLots(stopLoss);
+   if(signal == FLAT){
+      return;
+   }
+   
+   if(ReopenOnOppositeSignal && myTrade != FLAT && myTrade != signal){
+      double close = myTrade == LONG ? Bid : Ask;
+      if(!OrderClose(myTicket, OrderLots(), close, Slippage, Red)){
+         return;
+      }
+      myTicket = -1;
+      myTrade = FLAT;
+   }
+   
+   // calculate takeProfit and stopLoss
+   updateValues();
+   myLots = getLots(stopLoss);
+   
+   if(signal == LONG){      
       myTicket = openTrade(OP_BUY, "Buy Order", myLots, stopLoss, takeProfit);
    }
    else if(signal == SHORT){
-      myLots = getLots(stopLoss);
       myTicket = openTrade(OP_SELL, "Sell Order", myLots, stopLoss, takeProfit);
    }
+   
+   if(myTicket != -1){
+      myTrade = signal;
+   }
+   
 }
 
-
+// update myTicket and myTrade
 void checkTicket(){
    myTicket = -1;
+   myTrade = FLAT;
    for(int i = 0; i < OrdersTotal(); i++)
    {
       if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES) == false) break;
@@ -77,10 +93,12 @@ void checkTicket(){
       if(OrderMagicNumber() == MagicNumber && OrderSymbol() == Symbol())
       {
          if(OrderType() == OP_BUY){
-            myTicket = OrderTicket();   
+            myTicket = OrderTicket();
+            myTrade = LONG;   
          }
          else if(OrderType() == OP_SELL){
             myTicket = OrderTicket();
+            myTrade = SHORT;
          }
       }
    }     
@@ -129,7 +147,7 @@ double getLots(double StopInPips)
    if(Point == 0.001 || Point == 0.00001){ 
       TickValue *= 10;
    }
-      
+
    lot = (AccountValue * (RiskPercent/100)) / (TickValue * StopInPips);
    lot = StrToDouble(DoubleToStr(lot,Decimals));
    if (lot < myMinLot){ 
@@ -220,7 +238,7 @@ int getSignal()
    //int signal = getIndicatorCrossoverSignal("Vortex", indParams, 0, 1);
    double indParams[] = {25};
    int signal = getIndicatorCrossoverSignal("SSL", indParams, 1, 0);
-   //double indParams[] = {0,7,3,4,3};
+   //double indParams[] = {1,7,1,4,3};
    //int signal = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 2, 3);
    //double indParams[] = {14};
    //int signal = getIndicatorCrossoverSignal("RVI", indParams, 0, 1);
