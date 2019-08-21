@@ -2,7 +2,7 @@
 //|                                                        NNFX_backtest.mq4  |
 //|                                                       by Gonçalo Esteves  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.3  |
+//|                                                                     v1.4  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -26,16 +26,12 @@ double myLots;
 double myATR;
 double stopLoss;
 double takeProfit;
-int myTicket = -1;
-int myTrade = FLAT;
+int myTicket;
+int myTrade;
 
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
-
-void init() {
-}
-
 
 void OnTick()
 {  
@@ -46,7 +42,7 @@ void OnTick()
 //+------------------------------------------------------------------+
 
 void checkForOpen(){
-   if(!ReopenOnOppositeSignal && myTicket != -1){
+   if(!ReopenOnOppositeSignal && myTrade != FLAT){
       return;
    }
    
@@ -58,26 +54,26 @@ void checkForOpen(){
    
    if(ReopenOnOppositeSignal && myTrade != FLAT && myTrade != signal){
       double close = myTrade == LONG ? Bid : Ask;
-      if(!OrderClose(myTicket, OrderLots(), close, Slippage, Red)){
+      if(!OrderClose(myTicket, OrderLots(), close, Slippage)){
          return;
       }
       myTicket = -1;
       myTrade = FLAT;
    }
    
+   if(myTrade != FLAT){
+      return;
+   }
+   
    // calculate takeProfit and stopLoss
    updateValues();
    myLots = getLots(stopLoss);
    
-   if(signal == LONG){      
-      myTicket = openTrade(OP_BUY, "Buy Order", myLots, stopLoss, takeProfit);
+   if(signal == LONG){
+      openTrade(OP_BUY, "Buy Order", myLots, stopLoss, takeProfit);
    }
    else if(signal == SHORT){
-      myTicket = openTrade(OP_SELL, "Sell Order", myLots, stopLoss, takeProfit);
-   }
-   
-   if(myTicket != -1){
-      myTrade = signal;
+      openTrade(OP_SELL, "Sell Order", myLots, stopLoss, takeProfit);
    }
    
 }
@@ -86,22 +82,20 @@ void checkForOpen(){
 void checkTicket(){
    myTicket = -1;
    myTrade = FLAT;
-   for(int i = 0; i < OrdersTotal(); i++)
-   {
-      if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES) == false) break;
-      
-      if(OrderMagicNumber() == MagicNumber && OrderSymbol() == Symbol())
-      {
-         if(OrderType() == OP_BUY){
-            myTicket = OrderTicket();
-            myTrade = LONG;   
-         }
-         else if(OrderType() == OP_SELL){
-            myTicket = OrderTicket();
-            myTrade = SHORT;
-         }
+   if(OrdersTotal() >= 1){
+      if(!OrderSelect(0, SELECT_BY_POS, MODE_TRADES)){
+         return;   
       }
-   }     
+      int oType = OrderType();
+      if(oType == OP_BUY){
+         myTicket = OrderTicket();
+         myTrade = LONG;   
+      }
+      else if(oType == OP_SELL){
+         myTicket = OrderTicket();
+         myTrade = SHORT;
+      }
+   }
 }
 
 void updateValues(){
@@ -117,7 +111,6 @@ double getLots(double StopInPips)
    double myMaxLot = MarketInfo(Symbol(), MODE_MAXLOT);
    double myMinLot = MarketInfo(Symbol(), MODE_MINLOT);
    
- 
    double LotStep = MarketInfo(Symbol(), MODE_LOTSTEP);
    double LotSize = MarketInfo(Symbol(), MODE_LOTSIZE);
    double TickValue = MarketInfo(Symbol(), MODE_TICKVALUE);
@@ -143,7 +136,7 @@ double getLots(double StopInPips)
       default:
          return(MoneyManagementLots);
    }
-      
+   
    if(Point == 0.001 || Point == 0.00001){ 
       TickValue *= 10;
    }
@@ -160,19 +153,19 @@ double getLots(double StopInPips)
    return(lot);
 }
 
-int openTrade(int signal, string msg, double mLots, double mStopLoss, double mTakeProfit)
+void openTrade(int signal, string msg, double mLots, double mStopLoss, double mTakeProfit)
 {  
-   int ticket = -1;
    double TPprice, STprice;
   
    //RefreshRates();
    
    if (signal==OP_BUY) 
    {
-      ticket=OrderSend(Symbol(),OP_BUY,mLots,Ask,Slippage,0,0,msg,MagicNumber,0,Green);
-      if (ticket > 0)
+      myTicket = OrderSend(Symbol(),OP_BUY,mLots,Ask,Slippage,0,0,msg,MagicNumber,0,Green);
+      if (myTicket > 0)
       {
-         if (OrderSelect( ticket,SELECT_BY_TICKET, MODE_TRADES) ) 
+         myTrade = LONG;
+         if (OrderSelect(myTicket, SELECT_BY_TICKET, MODE_TRADES) ) 
          {
             TPprice = Ask + mTakeProfit*Point;
             STprice = Ask - mStopLoss*Point;
@@ -182,20 +175,21 @@ int openTrade(int signal, string msg, double mLots, double mStopLoss, double mTa
               STprice = NormalizeDouble( STprice, Digits);
               TPprice = NormalizeDouble( TPprice, Digits); 
             }
-		      if(!OrderModify(ticket, OrderOpenPrice(), STprice, TPprice,0, LightGreen)){
+		      if(!OrderModify(myTicket, OrderOpenPrice(), STprice, TPprice,0, LightGreen)){
                Print("OrderModify error ",GetLastError());
-               return(-1);
+               return;
 		      }
 		   }
          
       }
    }
-   else if (signal==OP_SELL) 
+   else if (signal == OP_SELL) 
    {
-      ticket=OrderSend(Symbol(),OP_SELL,mLots,Bid,Slippage,0,0,msg,MagicNumber,0,Red);
-      if (ticket > 0)
+      myTicket = OrderSend(Symbol(),OP_SELL,mLots,Bid,Slippage,0,0,msg,MagicNumber,0,Red);
+      if (myTicket > 0)
       {
-         if (OrderSelect( ticket,SELECT_BY_TICKET, MODE_TRADES) ) 
+         myTrade = SHORT;
+         if (OrderSelect(myTicket,SELECT_BY_TICKET, MODE_TRADES) ) 
          {
             TPprice=Bid - mTakeProfit*Point;
             STprice = Bid + mStopLoss*Point;
@@ -206,14 +200,13 @@ int openTrade(int signal, string msg, double mLots, double mStopLoss, double mTa
               TPprice = NormalizeDouble( TPprice, Digits); 
             }
 		      
-		      if(!OrderModify(ticket, OrderOpenPrice(), STprice, TPprice,0, LightGreen)){
+		      if(!OrderModify(myTicket, OrderOpenPrice(), STprice, TPprice,0, LightGreen)){
                Print("OrderModify error ",GetLastError());
-               return(-1);
+               return;
 		      }
          }
        }
    }
-   return(ticket);
 }
 
 
