@@ -341,7 +341,7 @@ double iCustomArray(string symbol, int timeframe, string indicator, double &para
       return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], mode, shift);   
    }
    else if(len >= 12){
-      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[11], mode, shift);   
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], mode, shift);   
    }
    return 0;
 }
