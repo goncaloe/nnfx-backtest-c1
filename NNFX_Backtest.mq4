@@ -2,7 +2,7 @@
 //|                                                        NNFX_backtest.mq4  |
 //|                                                       by Gonçalo Esteves  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.4  |
+//|                                                                     v1.5  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -325,7 +325,25 @@ double iCustomArray(string symbol, int timeframe, string indicator, double &para
    else if(len == 6){
       return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], mode, shift);   
    }
-   return(0);
+   else if(len == 7){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], mode, shift);   
+   }
+   else if(len == 8){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], mode, shift);   
+   }
+   else if(len == 9){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], mode, shift);   
+   }
+   else if(len == 10){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], mode, shift);   
+   }
+   else if(len == 11){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], mode, shift);   
+   }
+   else if(len >= 12){
+      return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[11], mode, shift);   
+   }
+   return 0;
 }
 
 // other specific indicators:
