@@ -2,7 +2,7 @@
 //|                                                        NNFX_backtest.mq4  |
 //|                                                       by Gonçalo Esteves  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.5  |
+//|                                                                     v1.6  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -28,10 +28,34 @@ double stopLoss;
 double takeProfit;
 int myTicket;
 int myTrade;
+int countWinsBeforeTP = 0;
+int countLossesBeforeSL = 0;
 
-//+------------------------------------------------------------------+
-//| Expert tick function                                             |
-//+------------------------------------------------------------------+
+
+void OnDeinit(const int reason){
+   int countTP = 0;
+   int countSL = 0;
+
+   int total = OrdersHistoryTotal();
+   for(int i = 0; i < total; i++){
+      if(OrderSelect(i, SELECT_BY_POS, MODE_HISTORY) == false){
+         Print("Access to history failed with error (",GetLastError(),")");
+         break;
+      }
+      
+      if(OrderType() == OP_BUY || OrderType() == OP_SELL){
+         if((OrderProfit()+OrderSwap()+OrderCommission()) > 0){
+            countTP++;
+         }
+         else {
+            countSL++;
+         }
+      }
+   }
+
+   string text = StringConcatenate("WinsTP: ", countTP - countWinsBeforeTP, "; LossesSL: ", countSL - countLossesBeforeSL, "; WinsBeforeTP: ", countWinsBeforeTP, "; LossesBeforeSL: ", countLossesBeforeSL);
+   Print(text);
+}
 
 void OnTick()
 {  
@@ -54,9 +78,23 @@ void checkForOpen(){
    
    if(ReopenOnOppositeSignal && myTrade != FLAT && myTrade != signal){
       double close = myTrade == LONG ? Bid : Ask;
+      
+      if(!OrderSelect(0, SELECT_BY_POS, MODE_TRADES)){
+         return;   
+      }
+      
       if(!OrderClose(myTicket, OrderLots(), close, Slippage)){
          return;
       }
+      
+      double profit = OrderProfit() + OrderSwap() + OrderCommission();
+      if(profit > 0){
+         countWinsBeforeTP++;      
+      }
+      else {
+         countLossesBeforeSL++; 
+      }
+      
       myTicket = -1;
       myTrade = FLAT;
    }
