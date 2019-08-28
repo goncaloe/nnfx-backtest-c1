@@ -10,7 +10,7 @@ Expert Advisor to backtest confirmation indicators in NNFX way
 * Save the file
 * Compile
 * Open MetaTrader4 and open Strategy Tester, select Expert Advisor NNFX_Backtest
-* Configure like below image and start. If the indicator is not shown in chart, check if the journal tab is it has errors
+* Configure like below image and click start button. If the indicator is not shown in chart, check if the journal tab if it has any error
 ![run ea](./run_ea.png)
 
 ## Test Other Indicators:
