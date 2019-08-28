@@ -2,7 +2,7 @@
 //|                                                        NNFX_backtest.mq4  |
 //|                                                       by Gonçalo Esteves  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.6  |
+//|                                                                     v1.7  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -21,6 +21,20 @@ extern double RiskPercent = 2;
 extern double MoneyManagementLots = 0.1;
 extern bool ReopenOnOppositeSignal = true;
 
+extern string IndicatorName = "";
+
+extern double Input1 = -1.1;
+extern double Input2 = -1.1;
+extern double Input3 = -1.1;
+extern double Input4 = -1.1;
+extern double Input5 = -1.1;
+extern double Input6 = -1.1;
+
+extern int SignalType = 1; //SignalType 1:0X, 2:2LinesX
+
+extern int SignalIndex1 = 0;
+extern int SignalIndex2 = 1;
+
 // GLOBAL VARIABLES:
 double myLots;
 double myATR;
@@ -31,8 +45,41 @@ int myTrade;
 int countWinsBeforeTP = 0;
 int countLossesBeforeSL = 0;
 
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
 
 void OnDeinit(const int reason){
+   double results[];
+   
+   getResults(results);
+
+   string text = StringConcatenate("WinsTP: ", results[0], "; LossesSL: ", results[1], "; WinsBeforeTP: ", results[2], "; LossesBeforeSL: ", results[3], "; WR: ", results[4]);
+   Print(text);
+}
+
+void OnTick()
+{  
+   checkTicket();
+   
+   checkForOpen();
+}
+
+double OnTester()
+{
+   double results[];
+   
+   getResults(results);
+   
+   return (results[4]);
+}
+//+------------------------------------------------------------------+
+
+void getResults(double& results[])
+{
+   //(E5+(G5/2)) / (E5+F5+(H5+G5)/2)
+   ArrayResize(results,5);
+   
    int countTP = 0;
    int countSL = 0;
 
@@ -52,18 +99,20 @@ void OnDeinit(const int reason){
          }
       }
    }
-
-   string text = StringConcatenate("WinsTP: ", countTP - countWinsBeforeTP, "; LossesSL: ", countSL - countLossesBeforeSL, "; WinsBeforeTP: ", countWinsBeforeTP, "; LossesBeforeSL: ", countLossesBeforeSL);
-   Print(text);
-}
-
-void OnTick()
-{  
-   checkTicket();
    
-   checkForOpen();
+   // "WinsTP: ", countTP - countWinsBeforeTP, "; LossesSL: ", countSL - countLossesBeforeSL, "; WinsBeforeTP: ", countWinsBeforeTP, "; LossesBeforeSL: ", countLossesBeforeSL
+   
+   // WinsTP
+   results[0] = countTP - countWinsBeforeTP;
+   // LossesSL
+   results[1] = countSL - countLossesBeforeSL;
+   // WinsBeforeTP
+   results[2] = countWinsBeforeTP;
+   // LossesBeforeSL
+   results[3] = countLossesBeforeSL;
+   // WR = (E5+(G5/2)) / (E5+F5+(H5+G5)/2)
+   results[4] = ( results[0] + (results[2] / 2) ) / ( results[0] + results[1] + ( results[3] + results[2] ) / 2 );
 }
-//+------------------------------------------------------------------+
 
 void checkForOpen(){
    if(!ReopenOnOppositeSignal && myTrade != FLAT){
@@ -247,6 +296,43 @@ void openTrade(int signal, string msg, double mLots, double mStopLoss, double mT
    }
 }
 
+void parseInputs(double& indParams[])
+{
+   
+   if (Input1 != -1.1)
+   {
+      ArrayResize(indParams,1);
+      indParams[0] = Input1;
+   }
+   if (Input2 != -1.1)
+   {
+      ArrayResize(indParams,2);
+      indParams[1] = Input2;
+   }
+   if (Input3 != -1.1)
+   {
+      ArrayResize(indParams,3);
+      indParams[2] = Input3;
+   }
+   if (Input4 != -1.1)
+   {
+      ArrayResize(indParams,4);
+      indParams[3] = Input4;
+   }
+   if (Input5 != -1.1)
+   {
+      ArrayResize(indParams,5);
+      indParams[3] = Input5;
+   }
+   if (Input6 != -1.1)
+   {
+      ArrayResize(indParams,6);
+      indParams[3] = Input6;
+   }
+      
+   //return (0);
+   //return (indParams);
+}
 
 /*
    return int: the signal of indicator
@@ -261,14 +347,15 @@ int getSignal()
    //int signal = getIndicatorMASignal("TEMA", 25, 0);
    
    //Zerocross:
-   //double indParams[] = {20};
-   //int signal = getIndicatorZerocrossSignal("CMF", indParams, 0);
+   //double indParams[] = {5, 34,5};
+   //int signal = getIndicatorZerocrossSignal("Accelerator_LSMA_v2", indParams, 0);
+   //Print(signal);
    
    //Crossover:
    //double indParams[] = {14};
    //int signal = getIndicatorCrossoverSignal("Vortex", indParams, 0, 1);
-   double indParams[] = {25};
-   int signal = getIndicatorCrossoverSignal("SSL", indParams, 1, 0);
+   //double indParams[] = {5, 34,5};
+   //int signal = getIndicatorCrossoverSignal("Accelerator_LSMA_v2", indParams, 1, 0);
    //double indParams[] = {1,7,1,4,3};
    //int signal = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 2, 3);
    //double indParams[] = {14};
@@ -280,10 +367,22 @@ int getSignal()
    //int result = getDidiSignal();
    //double indParams[] = {15, 120, 240};
    //int signal = getChaffSignal(indParams);
+   
+   double indParams[];
+   int signal = -1;
+   parseInputs(indParams);
+   
+   if (SignalType == 1)
+   {
+      signal = getIndicatorZerocrossSignal(IndicatorName, indParams, SignalIndex1);
+   }
+   else if (SignalType == 2)
+   {
+      signal = getIndicatorCrossoverSignal(IndicatorName, indParams, SignalIndex1, SignalIndex2);
+   }
 
    return(signal);
 }
-
 
 int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buff2)
 {
