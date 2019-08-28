@@ -1,16 +1,18 @@
 # nnfx-backtest
-Exper Advisor to backtest trend indicators in nnfx way
+Expert Advisor to backtest trend indicators in nnfx way
 
 ## How to Use:
 * Put the NNFX_Backtest.mq4 in MQL4/Experts folder
 * Open NNFX_backtest.mq4 in MetaEditor
 * Go to getSignal() function
 * Uncomment only the indParams and the line of indicator to test. Make sure that, if we are call getIndicator* function, the first parameter is the name of compiled indicator relative to the root indicators directory (MQL4/Indicators/). If the indicator is located in subdirectory, for example, in MQL4/Indicators/Examples, its name must be specified as "Examples\\\\indicator_name".
+
+![configure indicator](./config_ea.png)
+
 * Save the file
 * Compile
 * Open MetaTrader4 and open Strategy Tester, select Expert Advisor NNFX_Backtest
-
-![configure indicator](./config_ea.png)
+* Configure like below image and start. If the indicator is not shown in chart, check if the journal tab is show errors.
 
 ![run ea](./run_ea.png)
 
