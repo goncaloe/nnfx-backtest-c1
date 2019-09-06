@@ -72,6 +72,7 @@ void OnTick()
 
 double OnTester()
 {
+   updateBacktestResults();
    switch(OptimizationCalcType){
       case 0:
          return getNNFXWinrate();
@@ -334,6 +335,8 @@ void updateValues(){
 
 void updateBacktestResults()
 {
+   countTP = 0;
+   countSL = 0;
    int total = OrdersHistoryTotal();
    for(int i = 0; i < total; i++){
       if(OrderSelect(i, SELECT_BY_POS, MODE_HISTORY) == false){
@@ -357,7 +360,7 @@ void updateBacktestResults()
 
 double getNNFXWinrate(){
    double divisor = countTP + countSL + (countWinsBeforeTP + countLossesBeforeSL) / 2;
-   return divisor == 0 ? 0 : NormalizeDouble((countTP + (countWinsBeforeTP / 2)) / divisor, 2);
+   return divisor == 0 ? 0 : NormalizeDouble((countTP + (countWinsBeforeTP / 2)) * 100 / divisor, 2);
 }
 
 double getLots(double StopInPips){
