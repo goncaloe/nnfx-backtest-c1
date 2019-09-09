@@ -3,7 +3,7 @@
 //|                                                       by Gonçalo Esteves  |
 //|                                https://github.com/goncaloe/nnfx-backtest  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.8  |
+//|                                                                     v1.9  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -11,12 +11,27 @@
 #define FLAT 0
 #define LONG 1
 #define SHORT 2
-#define PARAM_EMPTY 999.0
+#define INPUT_EMPTY 999.0
 
 enum IndicatorTypes {
+   ________GENERIC_______ = 0,
    ZeroLine = 1,
    Crossover = 2,
    MovingAvarage = 3,
+   ________CROSSOVER_____ = 4,
+   Absolute_Strength_Histogram = 5,
+   Vortex = 6,
+   RVI = 7,
+   Aroon_Horn = 8,
+   ASO = 9,
+   SSL = 10,
+   ________ZEROLINE______ = 11,
+   Accelerator_LSMA = 12,
+   TSI = 13,
+   ________OTHER_________ = 14,
+   Schaff_Trend_Cycle = 15,      
+   ________VOLUME________ = 16,   
+   Waddah_Attar_Explosion = 17,
 };
 
 enum OptimizationCalcTypes {
@@ -34,16 +49,19 @@ sinput int TakeProfitPercent = 100;
 sinput int StopLossPercent = 150;
 sinput bool ReopenOnOppositeSignal = true;
 sinput OptimizationCalcTypes OptimizationCalcType = 0;
-sinput string IndicatorName = "MyIndicator";
+sinput string IndicatorPath = "MyIndicator";
 sinput IndicatorTypes IndicatorType = 1;
-extern double IndicatorParam1 = PARAM_EMPTY;
-extern double IndicatorParam2 = PARAM_EMPTY;
-extern double IndicatorParam3 = PARAM_EMPTY;
-extern double IndicatorParam4 = PARAM_EMPTY;
-extern double IndicatorParam5 = PARAM_EMPTY;
-extern double IndicatorParam6 = PARAM_EMPTY;
+sinput string IndicatorParams = "";
 sinput int IndicatorIndex1 = 0;
 sinput int IndicatorIndex2 = 1;
+extern double Input1 = INPUT_EMPTY;
+extern double Input2 = INPUT_EMPTY;
+extern double Input3 = INPUT_EMPTY;
+extern double Input4 = INPUT_EMPTY;
+extern double Input5 = INPUT_EMPTY;
+extern double Input6 = INPUT_EMPTY;
+extern double Input7 = INPUT_EMPTY;
+extern double Input8 = INPUT_EMPTY;
 
 
 // GLOBAL VARIABLES:
@@ -52,10 +70,16 @@ double stopLoss;
 double takeProfit;
 int myTicket;
 int myTrade;
+string myParams[];
 int countTP = 0;
 int countSL = 0;
 int countWinsBeforeTP = 0;
 int countLossesBeforeSL = 0;
+
+int OnInit(void){
+   prepareParameters(IndicatorParams, myParams);
+   return INIT_SUCCEEDED;
+}
 
 void OnDeinit(const int reason){  
    updateBacktestResults();
@@ -63,10 +87,8 @@ void OnDeinit(const int reason){
    Print(text);
 }
 
-void OnTick()
-{  
+void OnTick(){  
    checkTicket();
-   
    checkForOpen();
 }
 
@@ -85,6 +107,7 @@ double OnTester()
       case 4:
          return countLossesBeforeSL;        
    }
+
    return 0;
 }
 
@@ -99,58 +122,112 @@ for custom indicator uncomment only the indicator that we are testing
 */
 int getSignal()
 {
-   //Zeroline:
-   //double indParams[] = {5, 34,5};
-   //int signal = getIndicatorZerocrossSignal("Accelerator_LSMA_v2", indParams, 0);
-   //Print(signal);
-   
-   //Crossover:
-   //double indParams[] = {14};
-   //int signal = getIndicatorCrossoverSignal("Vortex", indParams, 0, 1);
-   //double indParams[] = {5, 34,5};
-   //int signal = getIndicatorCrossoverSignal("Accelerator_LSMA_v2", indParams, 1, 0);
-   //double indParams[] = {1,7,1,3,3};
-   //return getIndicatorCrossoverSignal("Absolute_Strength_Histogram", indParams, 2, 3);
-   //double indParams[] = {14};
-   //int signal = getIndicatorCrossoverSignal("RVI", indParams, 0, 1);
-   //double indParams[] = {14};
-   //int signal = getIndicatorCrossoverSignal("Aroon_Horn", indParams, 0, 1);
-   
-   //MA:
-   //return getIndicatorMASignal("TEMA", 25, 0);
+
+   //to test combo indicators, uncomment these 5 lines:
+   //double c1Params[] = {0,9,5,4,3};
+   //int c1 = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", c1Params, 2, 3);   
+   //double c2Params[] = {5,8};
+   //int c2 = getIndicatorZerocrossSignal("TSI", c2Params, 0);
+   //return comboSignal(c1, c2);
+
 
 
    //try get signal by Properties of Expert:
-   double indParams[6];
-   parseIndicatorParams(indParams);
-   
-   if (IndicatorType == 1)
-   {
-      return getIndicatorZerocrossSignal(IndicatorName, indParams, IndicatorIndex1);
+   int signal = FLAT;
+   double indParams[];
+   switch(IndicatorType){
+      case 1:
+         parseParametersDouble(myParams, indParams);
+         signal = getIndicatorZerocrossSignal(IndicatorPath, indParams, IndicatorIndex1);
+         break;
+      case 2:
+         parseParametersDouble(myParams, indParams);
+         signal = getIndicatorCrossoverSignal(IndicatorPath, indParams, IndicatorIndex1, IndicatorIndex2);
+         break;
+      case 3:
+         parseParametersDouble(myParams, indParams);
+         signal = getIndicatorMASignal(IndicatorPath, indParams, IndicatorIndex1);
+         break;
+      case 5:
+         signal = getAbsoluteStrengthHistogramSignal();
+         break;
+      case 6:
+         signal = getVortexSignal();    
+         break;         
+      case 7:
+         signal = getRVISignal();
+         break;
+      case 8:
+         signal = getAroonHornSignal();
+         break;
+      case 9:
+         signal = getASOSignal();
+         break;
+      case 10:
+         signal = getSSLSignal();
+         break;
+      case 12:
+         signal = getAcceleratorLSMASignal();    
+         break;
+      case 13:
+         signal = getTSISignal();    
+         break;
+      case 15:
+         signal = getSchaffTrendCycleSignal();
+         break;
+      case 17:
+         signal = getWaddahAttarExplosionSignal();
+         break;                     
    }
-   else if (IndicatorType == 2)
-   {
-      return getIndicatorCrossoverSignal(IndicatorName, indParams, IndicatorIndex1, IndicatorIndex2);
-   }
-   else if (IndicatorType == 3)
-   {
-      return getIndicatorMASignal(IndicatorName, indParams, IndicatorIndex1);
-   }
+      
+   return simpleSignal(signal);
+}
 
+// returns a new signal only when signal differ of previous
+int simpleSignal(int signal){
+   static int prevSignal = FLAT;
+   if(signal == FLAT){
+      return FLAT;
+   }
+   
+   if(prevSignal == FLAT){
+      prevSignal = signal;
+      return FLAT;
+   }
+   else if(prevSignal != signal){
+      prevSignal = signal;
+      return signal;
+   }
+   return FLAT;
+}
+
+// returns a new signal only when signal differ of previous
+int comboSignal(int c1Signal, int c2Signal){
+   static int prevSignal = FLAT;
+   if(c1Signal == FLAT){
+      return FLAT;
+   }
+   
+   if(prevSignal == FLAT){
+      prevSignal = c1Signal;
+      return FLAT;
+   }
+   else if(prevSignal != c1Signal && (myTrade == prevSignal || c1Signal == c2Signal)){
+      prevSignal = c1Signal;
+      return c1Signal;
+   }
    return FLAT;
 }
 
 int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buff2)
 {
    double v0Curr = iCustomArray(NULL, 0, ind, params, buff1, 1);
-   double v0Prev = iCustomArray(NULL, 0, ind, params, buff1, 2);
    double v1Curr = iCustomArray(NULL, 0, ind, params, buff2, 1);
-   double v1Prev = iCustomArray(NULL, 0, ind, params, buff2, 2);  
    int signal = FLAT;
-   if(v0Prev < v1Prev && v0Curr > v1Curr){
+   if(v0Curr > v1Curr){
       signal = LONG;
    }
-   else if(v0Prev > v1Prev && v0Curr < v1Curr){
+   else if(v0Curr < v1Curr){
       signal = SHORT;
    }
    return signal;
@@ -158,13 +235,12 @@ int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buf
 
 int getIndicatorZerocrossSignal(string ind, double &params[], int buff)
 {
-   double vCurr = iCustomArray(NULL, 0, ind, params, buff, 1);
-   double vPrev = iCustomArray(NULL, 0, ind, params, buff, 2);  
+   double vCurr = iCustomArray(NULL, 0, ind, params, buff, 1);  
    int signal = FLAT;
-   if(vPrev < 0 && vCurr >= 0){
+   if(vCurr >= 0){
       signal = LONG;
    }
-   else if(vPrev > 0 && vCurr <= 0){
+   else if(vCurr <= 0){
       signal = SHORT;
    }
    return signal;
@@ -174,24 +250,144 @@ int getIndicatorMASignal(string ind, double &params[], int buff)
 {
    double vCurr = iCustom(NULL, 0, ind, params[0], buff, 1);
    double vPrev = iCustom(NULL, 0, ind, params[0], buff, 2);
-   double vPrev2 = iCustom(NULL, 0, ind, params[0], buff, 3);
    
    int signal = FLAT;
-   if(vCurr > vPrev && vPrev2 >= vPrev){
+   if(vCurr > vPrev){
       signal = LONG;
    }
-   else if(vCurr < vPrev && vPrev2 <= vPrev){
+   else if(vCurr < vPrev){
       signal = SHORT;
    }
    return signal;
 }
 
-// alias:
-int getIndicatorMASignal(string ind, double period, int buff)
+int getAbsoluteStrengthHistogramSignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 7);
+   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 2, 3);
+}
+
+int getAcceleratorLSMASignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 3);
+   return getIndicatorZerocrossSignal(IndicatorPath, indParams, 0);
+}
+
+int getVortexSignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 1);
+   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 0, 1);
+}
+
+int getSchaffTrendCycleSignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 3);
+   
+   double vCurr = iCustomArray(NULL, 0, IndicatorPath, indParams, 0, 1);
+   double vPrev = iCustomArray(NULL, 0, IndicatorPath, indParams, 0, 2);
+   
+   int signal = FLAT;
+   
+   if(vPrev < 10 && vCurr > 10){
+      signal = LONG;
+   }
+   else if(vPrev > 90 && vCurr < 90){
+      signal = SHORT;
+   }
+   
+   return(signal);
+}
+
+int getTSISignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 2);
+   return getIndicatorZerocrossSignal(IndicatorPath, indParams, 0);
+}
+
+int getASOSignal(){
+   double param1 = 10;
+   double param2 = 0;
+   bool param3 = true;
+   bool param4 = true;
+   
+   int len = ArraySize(myParams);
+   if(len >= 1){
+      parseDouble(myParams[0], param1);
+   }
+   if(len >= 2){
+      parseDouble(myParams[1], param2);
+   }
+   if(len >= 3){
+      parseBool(myParams[2], param3);
+   }
+   if(len >= 4){
+      parseBool(myParams[3], param4);
+   }
+   
+   double vCurr = iCustom(NULL, 0, IndicatorPath, param1, param2, param3, param4, 0, 1);
+   if(vCurr >= 50){
+      return LONG;
+   }
+   else {
+      return SHORT;
+   }
+}
+
+
+int getDidiSignal()
 {
-   double indParams[1];
-   indParams[0] = period;
-   return getIndicatorMASignal(ind, indParams, buff);
+   string ind = "Didi_Index";
+   // rules: https://www.forexfactory.com/showthread.php?t=512503   
+   
+   double greenCurr = iCustom(NULL, 0, ind, 0, 1);
+   double greenPrev = iCustom(NULL, 0, ind, 0, 2);
+   double blue = 1.0;
+   double redCurr = iCustom(NULL, 0, ind, 2, 1);
+   double redPrev = iCustom(NULL, 0, ind, 2, 2);
+   
+   int signal = FLAT;
+   bool isCross = (greenPrev < blue && greenCurr > blue) || (redPrev > blue && redCurr < blue);
+   if(isCross && redCurr < blue){
+      signal = LONG;
+   }
+   else if(isCross && greenCurr < blue){
+      signal = SHORT;
+   }
+   return(signal);
+}
+
+int getSSLSignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 1);
+   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 1, 0);
+}
+
+int getRVISignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 1);
+   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 0, 1);
+}
+
+int getAroonHornSignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 1);
+   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 0, 1);
+}
+
+
+int getWaddahAttarExplosionSignal(){
+   double indParams[];
+   parseParametersDouble(myParams, indParams, 4);
+   double green = iCustomArray(NULL, 0, IndicatorPath, indParams, 0, 1);
+   double red = iCustomArray(NULL, 0, IndicatorPath, indParams, 1, 1);
+   double ma = iCustomArray(NULL, 0, IndicatorPath, indParams, 2, 1);
+   if(green > ma){
+      return LONG;
+   }
+   else if(red > ma){
+      return SHORT;
+   }
+   return FLAT;
 }
 
 
@@ -400,37 +596,6 @@ double getLots(double StopInPips){
    return lot;
 }
 
-void parseIndicatorParams(double &indParams[])
-{
-   int c = 0;
-   ArrayInitialize(indParams, EMPTY_VALUE);
-   if (IndicatorParam1 != PARAM_EMPTY){
-      c = 1;
-      indParams[0] = IndicatorParam1;
-   }
-   if (IndicatorParam2 != PARAM_EMPTY){
-      c = 2;
-      indParams[1] = IndicatorParam2;
-   }
-   if (IndicatorParam3 != PARAM_EMPTY){
-      c = 3;
-      indParams[2] = IndicatorParam3;
-   }
-   if (IndicatorParam4 != PARAM_EMPTY){
-      c = 4;
-      indParams[3] = IndicatorParam4;
-   }  
-   if (IndicatorParam5 != PARAM_EMPTY){
-      c = 5;
-      indParams[4] = IndicatorParam5;
-   }
-   if (IndicatorParam6 != PARAM_EMPTY){
-      c = 6;
-      indParams[5] = IndicatorParam6;
-   }
-   ArrayResize(indParams, c);
-}
-
 double iCustomArray(string symbol, int timeframe, string indicator, double &params[], int mode, int shift){
    int len = ArraySize(params);
    if(len == 0){
@@ -473,4 +638,74 @@ double iCustomArray(string symbol, int timeframe, string indicator, double &para
       return iCustom(symbol, timeframe, indicator, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], mode, shift);   
    }
    return 0;
+}
+
+void prepareParameters(const string params, string &parts[]){
+   ushort u_sep = StringGetCharacter(",", 0);
+   StringSplit(IndicatorParams, u_sep, parts);
+}
+
+void parseParametersDouble(string &params[], double &indParams[], int maxsize = NULL){
+   int k = ArraySize(myParams);
+   if(maxsize != NULL && maxsize < k){
+      k = maxsize;
+   }
+   ArrayResize(indParams, k);
+   for(int i = 0; i < k; i++){
+      parseDouble(myParams[i], indParams[i]);   
+   }
+}
+
+void parseDouble(string val, double &var, double def = 0){
+   if(StringGetChar(val, 0) == '#' && StringGetChar(val, 1) >= '1' && StringGetChar(val, 1) <= '8'){
+      parseInput(val, var);
+      return;
+   }
+   var = StrToDouble(val);
+}
+
+void parseColor(string val, color &var, color def = 0){
+   var = StringToColor(val);
+}
+
+void parseBool(string val, bool &var, bool def = false){
+   if(val == "1" || val == "true"){
+      var = true;   
+   }
+   else if(val == "0" || val == "false"){
+      var = false;
+   }
+   else {
+      var = def;
+   }
+}
+
+void parseInput(string val, double &var){
+   int idx = StrToInteger(StringSubstr(val, 1, 1));
+   switch(idx){
+      case 1:
+         var = Input1;
+         break;
+      case 2:
+         var = Input2;
+         break;
+      case 3:
+         var = Input3;
+         break;
+      case 4:
+         var = Input4;
+         break;
+      case 5:
+         var = Input5;
+         break;
+      case 6:
+         var = Input6;
+         break;
+      case 7:
+         var = Input7;
+         break;
+      case 8:
+         var = Input8;
+         break;                                     
+   }
 }
