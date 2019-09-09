@@ -12,6 +12,7 @@ Expert Advisor to backtest confirmation indicators in NNFX way
     * IndicatorPath: the name of compiled indicator relative to the root indicators directory (MQL4/Indicators/). If the indicator is located in subdirectory, for example, in MQL4/Indicators/Examples, its name must be specified as "Examples\\indicator_name".
     * IndicatorType: Dropdown of the indicator we want test.
     * IndicatorParams: comma-separated list of parameters. Leave blank to test with default parameters.
+![ea properties](./ea_properties.png)    
 * If the indicator is not shown in chart, check if the journal tab shows any error
 
 ## Generic Indicators:
@@ -31,5 +32,5 @@ Aroon_Horn | Crossover | 10
 ASO | Crossover | 10,0
 SSL | Crossover | 10,0
 TSI | Zeroline | 5,8
-Schaff_Trend_Cycle | 10,23,50
+Schaff_Trend_Cycle | Crossover | 10,23,50
 Waddah_Attar_Explosion | Others | 150,30,15,15
