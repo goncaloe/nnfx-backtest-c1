@@ -41,9 +41,9 @@ Winrate is calculated by wins / (wins + losses) but all wins or losses of opposi
 ![ea results](./ea_results.png)
 
 ## Optimization:
-In order to search for the best parameters for your indicator you can use the optimization. For to do this put #1, #2,... as parameter you will use optimization.
-In the example above you could use 0,#1,#2,#3,3 in IndicatorParams where #1 is Input1, #2 is Input2, #3 is Input3.
+In order to search for the best parameters for your indicator you can use the optimization. To do this put #1, #2,... as parameter you will use optimization.
+In the example above you could use 0,#1,#2,#3,3 in IndicatorParams where #1 is Input1, #2 is Input2, #3 is Input3:
 ![ea optimization](./ea_optimization.png)
 Click on checkbox optimization and start test.
 ![ea optimization results](./ea_optimization_results.png)
-As you can see the parameters with Input1=3, Input2=7, Input3=8  (parameters 0,3,7,8,3) got best results.
+As you can see the test with Input1=3, Input2=7, Input3=8  (parameters 0,3,7,8,3) got best results.
