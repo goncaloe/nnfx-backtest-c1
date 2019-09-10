@@ -83,7 +83,8 @@ int OnInit(void){
 
 void OnDeinit(const int reason){  
    updateBacktestResults();
-   string text = StringConcatenate("WinsTP: ", countTP, "; LossesSL: ", countSL, "; WinsBeforeTP: ", countWinsBeforeTP, "; LossesBeforeSL: ", countLossesBeforeSL, "; Winrate: ", getNNFXWinrate());
+   string text = StringConcatenate("WinsTP: ", countTP, "; LossesSL: ", countSL, "; WinsBeforeTP: ", countWinsBeforeTP, "; LossesBeforeSL: ", countLossesBeforeSL);
+   StringAdd(text, StringFormat("; Winrate: %.2f", getNNFXWinrate()));
    Print(text);
 }
 
@@ -201,7 +202,7 @@ int simpleSignal(int signal){
    return FLAT;
 }
 
-// returns a new signal only when signal differ of previous
+// returns a new signal only when signal differ of previous and c2 agrees
 int comboSignal(int c1Signal, int c2Signal){
    static int prevSignal = FLAT;
    if(c1Signal == FLAT){

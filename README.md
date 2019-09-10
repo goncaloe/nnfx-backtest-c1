@@ -39,3 +39,12 @@ Waddah_Attar_Explosion | Others | 150,30,15,15
 To see the report of backtest you can check the Report tab. You also can see how many orders where closed on opposite signal in Journal tab.
 Winrate is calculated by wins / (wins + losses) but all wins or losses of opposite sinal only counts half.
 ![ea results](./ea_results.png)
+
+## Optimization:
+In order to search for the best parameters for your indicator you can use the optimization. For this click on checkbox optimization and put #1, #2,... as parameter you want use as optimization.
+In the example above you could use 0,#1,#2,#3,3 in IndicatorParams where #1 is Input1, #2 is Input2, #3 is Input3.
+![ea optimization](./ea_optimization.png)
+Click on checkbox optimization and start test.
+
+![ea optimization results](./ea_optimization_results.png)
+As you can see the parameters with Input1=3, Input2=7, Input3=8  (parameters 0,3,7,8,3) got best results.
