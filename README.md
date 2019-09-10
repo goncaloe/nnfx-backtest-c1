@@ -5,15 +5,15 @@ Expert Advisor to backtest confirmation indicators in NNFX way
 ## How to Use:
 
 * Put the NNFX_Backtest.mq4 in MQL4/Experts folder
-* Refresh list of Expert Advisors to compile the EA.
+* Refresh list of Expert Advisors to compile the EA
 * Open Strategy Tester in MetaTrader4 and select Expert Advisor NNFX_Backtest.ex4
 * Configure it like below image:
 ![ea strategy tester](./ea_strategy_tester.png)
-* Click on "Expert Properties" and fill IndicatorPath, IndicatorType and IndicatorParams (double click in "Value" column):
+* Click on "Expert Properties" and fill IndicatorPath, IndicatorType and IndicatorParams (double click field in "Value" column):
 ![ea properties](./ea_properties.png)
     * IndicatorPath: the name of compiled indicator relative to the root indicators directory (MQL4/Indicators/). If the indicator is located in subdirectory, for example, in MQL4/Indicators/Examples, its name must be specified as "Examples\\indicator_name".
     * IndicatorType: Dropdown of the indicator to test.
-    * IndicatorParams: comma-separated list of parameters. You can omit parameters on the right, the EA will apply default values of these parameters. Leave blank to test with all default parameters.
+    * IndicatorParams: comma-separated list of parameters. You can omit parameters on the right, the EA will apply default values for these parameters. So you can leave blank to test with all default parameters.
 * Select "Open prices only" model and click on "Start": 
 ![ea run](./ea_run.png)
 
@@ -23,8 +23,10 @@ Expert Advisor to backtest confirmation indicators in NNFX way
 
 There are several built-in indicators available, but you can test many indicators type Crossover and Zeroline by select IndicatorType: 
 
-* Crossover: indicators that gives sinal when two lines crosses. Fill IndicatorIndex1 and IndicatorIndex2 to specify lines of indicator to cross.
+* Crossover: indicators that gives sinal when two lines crosses. Fill IndicatorIndex1 and IndicatorIndex2 (see in tab "Colors" of indicator) to specify lines of indicator to cross.
 * Zeroline: indicators that gives sinals when the value cross 0 line. Fill IndicatorIndex1 to specify the line of indicator to cross zero line.
+
+> Note: It is only possible to place indicators with numeric parameters in this way.
 
 ## Built-In Indicators:
 
