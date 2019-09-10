@@ -557,7 +557,7 @@ void updateBacktestResults()
 
 double getNNFXWinrate(){
    double divisor = countTP + countSL + (countWinsBeforeTP + countLossesBeforeSL) / 2;
-   return divisor == 0 ? 0 : NormalizeDouble((countTP + (countWinsBeforeTP / 2)) * 100 / divisor, 2);
+   return divisor == 0 ? 0 : (countTP + (countWinsBeforeTP / 2)) * 100 / divisor;
 }
 
 double getLots(double StopInPips){
@@ -644,6 +644,12 @@ double iCustomArray(string symbol, int timeframe, string indicator, double &para
 void prepareParameters(const string params, string &parts[]){
    ushort u_sep = StringGetCharacter(",", 0);
    StringSplit(IndicatorParams, u_sep, parts);
+   int k = ArraySize(parts);
+   int i = 0;
+   while(i < k){
+      parts[i] = StringTrimLeft(StringTrimRight(parts[i]));
+      i++;  
+   }
 }
 
 void parseParametersDouble(string &params[], double &indParams[], int maxsize = NULL){
