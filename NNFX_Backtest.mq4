@@ -15,9 +15,9 @@
 enum IndicatorTypes {
    ________GENERIC_______ = 0,
    ZeroLine = 1,
-   Crossover = 2,
+   LineCross = 2, // 2LineCross
    MovingAvarage = 3,
-   ________CROSSOVER_____ = 4,
+   ________2LINECROSS____ = 4,
    Absolute_Strength_Histogram = 5,
    Vortex = 6,
    RVI = 7,
@@ -125,9 +125,9 @@ int getSignal()
 
    //to test combo indicators, uncomment these 5 lines:
    //double c1Params[] = {0,9,5,4,3};
-   //int c1 = getIndicatorCrossoverSignal("Absolute_Strength_Histogram", c1Params, 2, 3);   
+   //int c1 = get2LineCrossSignal("Absolute_Strength_Histogram", c1Params, 2, 3);   
    //double c2Params[] = {5,8};
-   //int c2 = getIndicatorZerocrossSignal("TSI", c2Params, 0);
+   //int c2 = getZeroLineSignal("TSI", c2Params, 0);
    //return comboSignal(c1, c2);
 
 
@@ -138,15 +138,15 @@ int getSignal()
    switch(IndicatorType){
       case 1:
          parseParametersDouble(myParams, indParams);
-         signal = getIndicatorZerocrossSignal(IndicatorPath, indParams, IndicatorIndex1);
+         signal = getZeroLineSignal(IndicatorPath, indParams, IndicatorIndex1);
          break;
       case 2:
          parseParametersDouble(myParams, indParams);
-         signal = getIndicatorCrossoverSignal(IndicatorPath, indParams, IndicatorIndex1, IndicatorIndex2);
+         signal = get2LineCrossSignal(IndicatorPath, indParams, IndicatorIndex1, IndicatorIndex2);
          break;
       case 3:
          parseParametersDouble(myParams, indParams);
-         signal = getIndicatorMASignal(IndicatorPath, indParams, IndicatorIndex1);
+         signal = getMASignal(IndicatorPath, indParams, IndicatorIndex1);
          break;
       case 5:
          signal = getAbsoluteStrengthHistogramSignal();
@@ -219,7 +219,7 @@ int comboSignal(int c1Signal, int c2Signal){
    return FLAT;
 }
 
-int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buff2)
+int get2LineCrossSignal(string ind, double &params[], int buff1, int buff2)
 {
    double v0Curr = iCustomArray(NULL, 0, ind, params, buff1, 1);
    double v1Curr = iCustomArray(NULL, 0, ind, params, buff2, 1);
@@ -233,7 +233,7 @@ int getIndicatorCrossoverSignal(string ind, double &params[], int buff1, int buf
    return signal;
 }
 
-int getIndicatorZerocrossSignal(string ind, double &params[], int buff)
+int getZeroLineSignal(string ind, double &params[], int buff)
 {
    double vCurr = iCustomArray(NULL, 0, ind, params, buff, 1);  
    int signal = FLAT;
@@ -246,7 +246,7 @@ int getIndicatorZerocrossSignal(string ind, double &params[], int buff)
    return signal;
 }
 
-int getIndicatorMASignal(string ind, double &params[], int buff)
+int getMASignal(string ind, double &params[], int buff)
 {
    double vCurr = iCustom(NULL, 0, ind, params[0], buff, 1);
    double vPrev = iCustom(NULL, 0, ind, params[0], buff, 2);
@@ -264,19 +264,19 @@ int getIndicatorMASignal(string ind, double &params[], int buff)
 int getAbsoluteStrengthHistogramSignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 7);
-   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 2, 3);
+   return get2LineCrossSignal(IndicatorPath, indParams, 2, 3);
 }
 
 int getAcceleratorLSMASignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 3);
-   return getIndicatorZerocrossSignal(IndicatorPath, indParams, 0);
+   return getZeroLineSignal(IndicatorPath, indParams, 0);
 }
 
 int getVortexSignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 1);
-   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 0, 1);
+   return get2LineCrossSignal(IndicatorPath, indParams, 0, 1);
 }
 
 int getSchaffTrendCycleSignal(){
@@ -301,7 +301,7 @@ int getSchaffTrendCycleSignal(){
 int getTSISignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 2);
-   return getIndicatorZerocrossSignal(IndicatorPath, indParams, 0);
+   return getZeroLineSignal(IndicatorPath, indParams, 0);
 }
 
 int getASOSignal(){
@@ -346,11 +346,11 @@ int getDidiSignal()
    double redPrev = iCustom(NULL, 0, ind, 2, 2);
    
    int signal = FLAT;
-   bool isCross = (greenPrev < blue && greenCurr > blue) || (redPrev > blue && redCurr < blue);
-   if(isCross && redCurr < blue){
+   bool iscross = (greenPrev < blue && greenCurr > blue) || (redPrev > blue && redCurr < blue);
+   if(iscross && redCurr < blue){
       signal = LONG;
    }
-   else if(isCross && greenCurr < blue){
+   else if(iscross && greenCurr < blue){
       signal = SHORT;
    }
    return(signal);
@@ -359,19 +359,19 @@ int getDidiSignal()
 int getSSLSignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 1);
-   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 1, 0);
+   return get2LineCrossSignal(IndicatorPath, indParams, 1, 0);
 }
 
 int getRVISignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 1);
-   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 0, 1);
+   return get2LineCrossSignal(IndicatorPath, indParams, 0, 1);
 }
 
 int getAroonHornSignal(){
    double indParams[];
    parseParametersDouble(myParams, indParams, 1);
-   return getIndicatorCrossoverSignal(IndicatorPath, indParams, 0, 1);
+   return get2LineCrossSignal(IndicatorPath, indParams, 0, 1);
 }
 
 

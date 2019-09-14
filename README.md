@@ -21,10 +21,10 @@ Expert Advisor to backtest confirmation indicators in NNFX way
 
 ## Generic Indicators:
 
-There are several built-in indicators available, but you can test many indicators type Crossover and Zeroline by select IndicatorType: 
+There are several built-in indicators available, but you can test many indicators type 2LineCross and ZeroLine by select IndicatorType: 
 
-* Crossover: indicators that gives sinal when two lines crosses. Fill IndicatorIndex1 and IndicatorIndex2 (see in tab "Colors" of indicator) to specify lines of indicator to cross.
-* Zeroline: indicators that gives sinals when the value cross 0 line. Fill IndicatorIndex1 to specify the line of indicator to cross zero line.
+* 2LineCross: indicators that gives sinal when two lines crosses. Fill IndicatorIndex1 and IndicatorIndex2 (see in tab "Colors" of indicator) to specify lines of indicator to cross.
+* ZeroLine: indicators that gives sinals when the value cross 0 line. Fill IndicatorIndex1 to specify the line of indicator to cross zero line.
 
 > Note: It is only possible to place indicators with numeric parameters in this way.
 
@@ -34,16 +34,16 @@ To be easier to use, you can use these built-in indicators available:
 
 Indicator | Type  | Default Params
 --------- | ----- | --------------
-Absolute_Strength_Histogram | Crossover | 0,9,1,4,0,3,3
-Accelerator_LSMA | Zeroline | 5,34,5
-Vortex | Crossover | 14
-RVI | Crossover | 10
-Aroon_Horn | Crossover | 10
-ASO | Crossover | 10,0
-SSL | Crossover | 10,0
-TSI | Zeroline | 5,8
-Schaff_Trend_Cycle | Crossover | 10,23,50
-Waddah_Attar_Explosion | Others | 150,30,15,15
+Absolute_Strength_Histogram | 2LineCross | 0,9,1,4,0,3,3
+Accelerator_LSMA | ZeroLine | 5,34,5
+Vortex | 2LineCross | 14
+RVI | 2LineCross | 10
+Aroon_Horn | 2LineCross | 10
+ASO | 2LineCross | 10,0
+SSL | 2LineCross | 10,0
+TSI | ZeroLine | 5,8
+Schaff_Trend_Cycle | 2LineCross | 10,23,50
+Waddah_Attar_Explosion | Other | 150,30,15,15
 
 > Note: Each of these indicators has been prepared for a specific version. If you have a different version or is not shown in this list, ask me to include it in EA.
 
