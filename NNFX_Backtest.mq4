@@ -11,7 +11,6 @@
 #define FLAT 0
 #define LONG 1
 #define SHORT 2
-#define INPUT_EMPTY 999.0
 
 enum IndicatorTypes {
    ________GENERIC_______ = 0,
@@ -54,14 +53,14 @@ sinput IndicatorTypes IndicatorType = 1;
 sinput string IndicatorParams = "";
 sinput int IndicatorIndex1 = 0;
 sinput int IndicatorIndex2 = 1;
-extern double Input1 = INPUT_EMPTY;
-extern double Input2 = INPUT_EMPTY;
-extern double Input3 = INPUT_EMPTY;
-extern double Input4 = INPUT_EMPTY;
-extern double Input5 = INPUT_EMPTY;
-extern double Input6 = INPUT_EMPTY;
-extern double Input7 = INPUT_EMPTY;
-extern double Input8 = INPUT_EMPTY;
+extern double Input1 = 0;
+extern double Input2 = 0;
+extern double Input3 = 0;
+extern double Input4 = 0;
+extern double Input5 = 0;
+extern double Input6 = 0;
+extern double Input7 = 0;
+extern double Input8 = 0;
 
 
 // GLOBAL VARIABLES:
@@ -560,38 +559,37 @@ double getNNFXWinrate(){
    return divisor == 0 ? 0 : (countTP + (countWinsBeforeTP / 2)) * 100 / divisor;
 }
 
-double getLots(double StopInPips){
-   double lot = 0.01;
-   
-   double TickValue = MarketInfo(_Symbol, MODE_TICKVALUE);
-   double divisor = (TickValue * StopInPips);
+double getLots(double StopInPips){   
+   double minLot = MarketInfo(_Symbol, MODE_MINLOT);
+   double tickValue = MarketInfo(_Symbol, MODE_TICKVALUE);
+ 
+   double divisor = (tickValue * StopInPips);
    if(divisor == 0.0){
-      return lot;   
+      return minLot;   
    }
-   
-   double LotStep = MarketInfo(_Symbol, MODE_LOTSTEP);
-   int    Decimals = 0;
-   if(LotStep == 0.1){
-      Decimals = 1;
+
+   double maxLot = MarketInfo(_Symbol, MODE_MAXLOT);
+   double lotStep = MarketInfo(_Symbol, MODE_LOTSTEP);
+   int decimals = 0;
+   if(lotStep == 0.1){
+      decimals = 1;
    }
-   else if(LotStep == 0.01){
-      Decimals = 2;
+   else if(lotStep == 0.01){
+      decimals = 2;
    }
 
    if(Point == 0.001 || Point == 0.00001){ 
-      TickValue *= 10;
+      divisor *= 10;
    }
+
+   double lot = (AccountBalance() * (RiskPercent/100)) / divisor;
+   lot = StrToDouble(DoubleToStr(lot, decimals));
    
-   double AccountValue = AccountBalance();
-   lot = (AccountValue * (RiskPercent/100)) / divisor;
-   lot = StrToDouble(DoubleToStr(lot,Decimals));
-   double myMaxLot = MarketInfo(_Symbol, MODE_MAXLOT);
-   double myMinLot = MarketInfo(_Symbol, MODE_MINLOT);
-   if (lot < myMinLot){ 
-      lot = myMinLot;
+   if (lot < minLot){ 
+      lot = minLot;
    }
-   if (lot > myMaxLot){ 
-      lot = myMaxLot;
+   if (lot > maxLot){ 
+      lot = maxLot;
    }
 
    return lot;
