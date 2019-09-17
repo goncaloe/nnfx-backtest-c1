@@ -3,7 +3,7 @@
 //|                                                       by Gonçalo Esteves  |
 //|                                https://github.com/goncaloe/nnfx-backtest  |
 //|                                                          August 17, 2019  |
-//|                                                                     v1.9  |
+//|                                                                    v1.10  |
 //+---------------------------------------------------------------------------+
 #property copyright "Copyright 2019, Gonçalo Esteves"
 #property strict
@@ -186,6 +186,13 @@ int getSignal()
 // returns a new signal only when signal differ of previous
 int simpleSignal(int signal){
    static int prevSignal = FLAT;
+   static datetime prevDt = 0;
+
+   if(prevDt != Time[1]){
+      prevSignal = FLAT; // invalidate prevSignal
+   }
+   prevDt = Time[0];
+
    if(signal == FLAT){
       return FLAT;
    }
@@ -204,6 +211,13 @@ int simpleSignal(int signal){
 // returns a new signal only when signal differ of previous and c2 agrees
 int comboSignal(int c1Signal, int c2Signal){
    static int prevSignal = FLAT;
+   static datetime prevDt = 0;
+
+   if(prevDt != Time[1]){
+      prevSignal = FLAT; // invalidate prevSignal
+   }
+   prevDt = Time[0];
+
    if(c1Signal == FLAT){
       return FLAT;
    }
