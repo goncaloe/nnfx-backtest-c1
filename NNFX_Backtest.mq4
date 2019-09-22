@@ -538,7 +538,9 @@ void checkTicket(){
 //+-AUXILIAR FUNCTIONS----------------------------------------------+
 
 void updateValues(){
+   HideTestIndicators(true);
    myATR = iATR(NULL, 0, ATRPeriod, 1)/Point;
+   HideTestIndicators(false);
    takeProfit = myATR * TakeProfitPercent/100.0;
    stopLoss = myATR * StopLossPercent/100.0;    
 }
