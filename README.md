@@ -8,7 +8,7 @@ Expert Advisor to backtest **confirmation** indicators in NNFX way
 * Open Strategy Tester in MetaTrader4 and select Expert Advisor NNFX_Backtest.ex4
 * Configure it like below image:
 ![ea strategy tester](./images/ea_strategy_tester.png)
-* Click on "Expert Properties" and fill IndicatorPath, IndicatorType and IndicatorParams (double click field in "Value" column):
+* Click on "Expert Properties" and fill `C1 Type` and `C1 Parameters` (double click field in "Value" column):
 ![ea properties](./images/ea_properties.png)
     * C1 Type: Dropdown type of the indicator to test.
     * C1 Parameters: semicolon-separated of parameters in this order: `inputs`; `indicator_name`; `buffers`; `levels`
@@ -30,7 +30,7 @@ ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffe
 1Level Cross | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0` | When `buffer0` cross `value0` 
 2Level Cross | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0,value1` | When `buffer0` cross `value0` or when `buffer1` cross `value1`
 Single Line | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffer0` starts grow up or go down
-Histogram | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` cross `buffer1`
+Histogram | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` is filled or when `buffer1` is filled
 
 ## Examples:
 
