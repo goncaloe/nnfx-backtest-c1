@@ -4,8 +4,8 @@ Expert Advisor to backtest **confirmation** indicators in NNFX way
 
 ## How to Use:
 
-* Put the NNFX_Backtest.ex4 in MQL4/Experts folder
-* Open Strategy Tester in MetaTrader4 and select Expert Advisor NNFX_Backtest.ex4
+* Put the NNFX_Backtest_C1.ex4 in MQL4/Experts folder
+* Open Strategy Tester in MetaTrader4 and select Expert Advisor NNFX_Backtest_C1.ex4
 * Configure it like below image:
 ![ea strategy tester](./images/ea_strategy_tester.png)
 * Click on "Expert Properties" and fill IndicatorPath, IndicatorType and IndicatorParams (double click field in "Value" column):
@@ -15,7 +15,6 @@ Expert Advisor to backtest **confirmation** indicators in NNFX way
         * `inputs`: comma-separated list of inputs. You can omit parameters on the right, the EA will apply default values for these inputs. So you can leave blank to test with all default inputs.
         * `indicator_name`: the name of compiled indicator relative to the root indicators directory (MQL4/Indicators/). If the indicator is located in subdirectory, for example, in MQL4/Indicators/Examples, its name must be specified as "Examples\\indicator_name".
         * `buffers`: comma-separated list of buffers, start at 0, of the indicator.
-        * `levels`: comma-separated list levels. Only aplies to `1Level Cross` and `2Level Cross` types.
 * Select "Open prices only" model and click on "Start": 
 ![ea run](./images/ea_run.png)
 
@@ -27,10 +26,10 @@ Indicator | Inputs | Signal
 --------- | ---------- | -----
 2Line Cross | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` cross `buffer1`
 ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffer0` cross value 0
-1Level Cross | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0` | When `buffer0` cross `value0` 
-2Level Cross | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0,value1` | When `buffer0` cross `value0` or when `buffer1` cross `value1`
-Single Line | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffer0` starts grow up or go down
-Histogram | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` cross `buffer1`
+1Level Cross (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0` | When `buffer0` cross `value0` 
+2Level Cross (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0,value1` | When `buffer0` cross `value0` or when `buffer1` cross `value1`
+Single Line (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffer0` starts grow up or go down
+Histogram (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` cross `buffer1`
 
 ## Examples:
 
@@ -38,10 +37,6 @@ C1 Type | C1 Parameters
 ------- | -------------
 2Line Cross | 10;RVI;0,1
 ZeroLine Cross | 4;DPO;0
-1Level Cross | 14;ADX;25
-2Level Cross | 10,23,50;Schaff_Trend_Cycle;95,5
-Single Line | 14;Hull_MA;0
-Histogram | 0,9,1,4,0,3,3;Absolute_Strength_Histogram;0,1
 
 ## Backtest Results:
 
