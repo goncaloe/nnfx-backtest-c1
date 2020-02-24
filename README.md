@@ -8,7 +8,7 @@ Expert Advisor to backtest **confirmation** indicators in NNFX way
 * Open Strategy Tester in MetaTrader4 and select Expert Advisor NNFX_Backtest_C1.ex4
 * Configure it like below image:
 ![ea strategy tester](./images/ea_strategy_tester.png)
-* Click on "Expert Properties" and fill IndicatorPath, IndicatorType and IndicatorParams (double click field in "Value" column):
+* Click on "Expert Properties" and fill `C1 Type` and `C1 Parameters` (double click field in "Value" column):
 ![ea properties](./images/ea_properties.png)
     * C1 Type: Dropdown type of the indicator to test.
     * C1 Parameters: semicolon-separated of parameters in this order: `inputs`; `indicator_name`; `buffers`; `levels`
@@ -37,6 +37,7 @@ C1 Type | C1 Parameters
 ------- | -------------
 2Line Cross | 10;RVI;0,1
 ZeroLine Cross | 4;DPO;0
+
 
 ## Backtest Results:
 
