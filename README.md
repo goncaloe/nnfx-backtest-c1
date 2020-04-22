@@ -24,12 +24,12 @@ Expert Advisor to backtest **confirmation** indicators in NNFX way
 
 Indicator | Inputs | Signal
 --------- | ---------- | -----
-2Line Cross | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` cross `buffer1`
-ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffer0` cross value 0
+2Line Cross | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | Buy when `buffer0` cross `buffer1` and is above. Sell otherwise
+ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | Buy/Sell when `buffer0` cross value 0
+Histogram | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | Buy when `buffer0` is filled. Sell when `buffer1` is filled.
 1Level Cross (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0` | When `buffer0` cross `value0` 
 2Level Cross (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0`;`value0,value1` | When `buffer0` cross `value0` or when `buffer1` cross `value1`
 Single Line (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0` | When `buffer0` starts grow up or go down
-Histogram (Full Version) | `param1,param2,param3`;`indicator_name`;`buffer0,buffor1` | When `buffer0` cross `buffer1`
 
 ## Examples:
 
