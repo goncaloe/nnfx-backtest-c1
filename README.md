@@ -2,6 +2,8 @@
 
 Expert Advisor to backtest **confirmation** indicators in NNFX way
 
+Video: [https://vimeo.com/394968423][https://vimeo.com/394968423]
+
 ## How to Use:
 
 * Put the NNFX_Backtest_C1.ex4 in MQL4/Experts folder
@@ -57,3 +59,5 @@ Click on checkbox optimization and start test.
 ![ea optimization results](./images/ea_optimization_results.png)
 
 As you can see the test with Input1=11, Input2=1  (inputs `0,11,1,4,0,3,3`) got best results.
+
+[https://vimeo.com/394968423]: https://vimeo.com/394968423
