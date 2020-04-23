@@ -27,7 +27,7 @@ Video: [https://vimeo.com/394968423][https://vimeo.com/394968423]
 Indicator | Inputs | Signal
 --------- | ---------- | -----
 2Line Cross | `param1,param2,param3`;`indicator_name`;`buffer0,buffer1` | Buy when `buffer0` cross `buffer1` and is above. Sell otherwise
-ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | Buy/Sell when `buffer0` cross value 0
+ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | Buy when `buffer0` cross above 0. Sell when `buffer0` cross below 0
 Histogram | `param1,param2,param3`;`indicator_name`;`buffer0,buffer1` | Buy when `buffer0` is filled. Sell when `buffer1` is filled
 
 ## Examples:
