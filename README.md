@@ -26,22 +26,55 @@ Video: [https://vimeo.com/394968423][https://vimeo.com/394968423]
 
 Indicator | Inputs | Signal
 --------- | ---------- | -----
-2Line Cross | `param1,param2,param3`;`indicator_name`;`buffer0,buffer1` | Buy when `buffer0` cross `buffer1` and is above. Sell otherwise
-ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer0` | Buy when `buffer0` cross above 0. Sell when `buffer0` cross below 0
-Histogram | `param1,param2,param3`;`indicator_name`;`buffer0,buffer1` | Buy when `buffer0` is filled. Sell when `buffer1` is filled
+2Line Cross | `param1,param2,param3`;`indicator_name`;`1ºbuffer,2ºbuffer` | Buy when `1ºbuffer` cross `2ºbuffer` and is above. Sell otherwise
+ZeroLine Cross | `param1,param2,param3`;`indicator_name`;`buffer` | Buy when `buffer` cross above 0. Sell when `buffer` cross below 0
+Histogram | `param1,param2,param3`;`indicator_name`;`1ºbuffer,2ºbuffer` | Buy when `1ºbuffer` is filled. Sell when `2ºbuffer` is filled
 
-## Examples:
+> Note: In order to identify the type of indicator, you should put the indicator on chart and mouse hover candles and see in `Data Window` how values are changed.
 
-C1 Type | C1 Parameters
-------- | -------------
-2Line Cross | 10;RVI;0,1
-ZeroLine Cross | 4;DPO;0
-Histogram | 0,9,1,4,0,3,3;Absolute_Strength_Histogram;0,1
+### 2Line Cross
+
+You must use `2 Line Cross` when the graph of indicator has two continuous lines that intersect between them.
+<br>Buy signal is given when the value of `1ºbuffer` cross `2ºbuffer` and is above.
+<br>Sell signal is given when the value of `1ºbuffer` cross `2ºbuffer` and is below. 
+
+![ea rvi](./images/ea_rvi.png)
+
+In this example, putting the mouse over indicator RVI we see in `Data Window` that values of `1º buffer` in position `0` refers to green line, and values of `2º buffer` in position `1` refers to red line.
+<br>So, the list of positions of buffers for this indicator is `0,1`
+
+> Tip: for this example we use C1 Type: `2 Line Cross` and C1 Params: `10;RVI;0,1`
+
+### Zeroline Cross
+
+`Zeroline Cross` is used when the indicator has a continuous line that cross 0 value.
+<br>Buy signal is given when the value of `buffer` cross value 0 and is above.
+<br>Sell signal is given when the value of `buffer`  cross value 0 and is below 0. 
+
+> Tip: for this example we use C1 Type: `Zeroline Cross` and C1 Params: `4;DPO;0`
+
+![ea pdo](./images/ea_pdo.png)
+
+In this example, putting the mouse over indicator DPO we see in `Data Window` that values of `buffer` (position 0 in Data Window) refers to white line.
+<br>So, the list of positions of buffers for this indicator is `0`
+
+### Histogram
+
+`Histogram` is used when the indicator has two buffers where one is alternately filled and other is empty.
+<br>Buy signal is given when `1ºbuffer` has values and `2ºbuffer` is empty.
+<br>Sell signal is given when `1ºbuffer` is empty and `2ºbuffer` has values. 
+
+![ea ash](./images/ea_ash.png)
+
+In this example, putting the mouse over indicator Absolute_Strength_Histogram we see in `Data Window` that values of `1ºbuffer` (position 0 in Data Window) refers to green line, and values of `2ºbuffer` (position 1 in Data Window) refers to red line.
+<br>So, the list of positions of buffers for this indicator is `0,1`
+
+> Tip: for this example we use C1 Type: `Histogram` and C1 Params: `0,9,1,4,0,3,3;Absolute_Strength_Histogram;0,1`
 
 ## Backtest Results:
 
 To see the report of backtest you can check the Report tab. You also can see how many orders where closed on opposite signal in Journal tab.
-Winrate is calculated by wins / (wins + losses) but all wins or losses of opposite sinal only counts half.
+Winrate Estimated is calculated by wins / (wins + losses) but all wins or losses of opposite sinal only counts half.
 
 ![ea results](./images/ea_results.png)
 
