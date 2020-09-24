@@ -14,7 +14,7 @@ Video: [https://vimeo.com/394968423][https://vimeo.com/394968423]
 ![ea properties](./images/ea_properties.png)
     * C1 Type: Dropdown type of the indicator to test.
     * C1 Parameters: semicolon-separated of parameters in this order: `inputs`; `indicator_name`; `buffers`
-        * `inputs`: comma-separated list of inputs. You can omit parameters on the right, the EA will apply default values for these inputs. So you can leave blank to test with all default inputs.
+        * `inputs`: comma-separated list of inputs. You can omit parameters on the right, the EA will apply default values for these inputs. So you can leave blank to test with all default inputs. For inputs of type dropdown, it is necessary to put the position, starts at 0, of option in dropdown.
         * `indicator_name`: the name of compiled indicator relative to the root indicators directory (MQL4/Indicators/). If the indicator is located in subdirectory, for example, in MQL4/Indicators/Examples, its name must be specified as "Examples\\indicator_name".
         * `buffers`: comma-separated list of buffers, start at 0, of the indicator (Data Window).
 * Select "Open prices only" model and click on "Start": 
@@ -94,3 +94,8 @@ Click on checkbox optimization and start test.
 As you can see the test with Input1=11, Input2=1  (inputs `0,11,1,4,0,3,3`) got best results.
 
 [https://vimeo.com/394968423]: https://vimeo.com/394968423
+
+## Limitations:
+
+The strategy tester in "Open prices only" model check signals on every new candle at 0:00. At this point, we can't use the close price for it is not yet formed.
+Because this the EA use the close of previous candle to check signals. When there are entry signals (previous close), the order will be open with current Bid/Ask price, which does not correspond to the closing price of the previous candle.
